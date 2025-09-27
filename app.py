@@ -1,15 +1,11 @@
 import logging
-import random
-import string
 import os
 import time
 
-import pandas
-from selenium import webdriver
+import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options as ChromeOptions
-from selenium.webdriver.firefox.options import Options as FirefoxOptions
-
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 logging.basicConfig(
     handlers=[logging.FileHandler('app.log'), logging.StreamHandler()],
@@ -38,19 +34,29 @@ Creators = {
     'tocomfome': {
         'INSTAGRAM': '_tocomfome_sp',
         'TIKTOK': 'to.com.fomr.sp',
-        'YOUTUBE': ''
+        'YOUTUBE': 'tocomfomesp'
     },
     'dizcordia': {
         'INSTAGRAM': 'dizcordia.pura',
         'TIKTOK': 'diz_cordia',
-        'YOUTUBE': 'UCMOlw3yMWN7rDCdh86uZ0cQ'
+        'YOUTUBE': 'Diz_cordia'
     },
     'twins': {
         'INSTAGRAM': 'diariode_Twins',
         'TIKTOK': 'diario.de.twins',
         'YOUTUBE': 'diariodeTwins'
     },
+    'chefs': {
+        'INSTAGRAM': 'chefsdelacoss',
+        'TIKTOK': 'chefsde_lacos',
+        'YOUTUBE': 'chefsdelaco'
+    },
     'minecraft': {
+        'INSTAGRAM': '',
+        'TIKTOK': '',
+        'YOUTUBE': ''
+    },
+    'tralalelo': {
         'INSTAGRAM': '',
         'TIKTOK': '',
         'YOUTUBE': ''
@@ -60,22 +66,51 @@ Creators = {
 
 def init_driver():
     try:
-        if os.path.exists('/usr/bin/firefox'):
-            options = FirefoxOptions()
-            options.add_argument('-headless')
-            driver = webdriver.Firefox(options=options)
-            driver.implicitly_wait(10)
-        else:
-            options = ChromeOptions()
-            options.binary_location = '/usr/bin/chromium-browser'
-            options.add_argument('-headless')
-            driver = webdriver.Chrome(options=options)
-            driver.implicitly_wait(10)
+        driver = uc.Chrome(headless=True, use_subprocess=False,)
+        driver.implicitly_wait(10)
 
         return driver
-    
+
     except Exception as error:
         logging.critical(error)
+
+
+def cycle_pages(driver):
+    driver.get(f'https://instagram.com/virginia')
+
+    try:
+        # Espera até o botão de aceitar cookies aparecer
+        botao = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable(
+                (By.XPATH, "//*[contains(., 'Permitir todos os cookies')]"))
+        )
+        botao.click()
+    except:
+        print("Nenhum modal de cookies detectado")
+
+    driver.get(f'https://tiktok.com/@virginiafonseca')
+
+    try:
+        # Espera até o botão de aceitar cookies aparecer
+        botao = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable(
+                (By.XPATH, "//*[contains(., 'Permitir todos')]"))
+        )
+        botao.click()
+    except:
+        print("Nenhum modal de cookies detectado")
+
+    driver.get(f'https://www.youtube.com/channel/UCsaB2VrLZrtGbum6Eo0ClbA')
+
+    try:
+        # Espera até o botão de aceitar cookies aparecer
+        botao = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable(
+                (By.XPATH, "//*[contains(., 'Aceitar tudo')]"))
+        )
+        botao.click()
+    except:
+        print("Nenhum modal de cookies detectado")
 
 
 def get_screenshots():
@@ -85,21 +120,21 @@ def get_screenshots():
         date = datetime.now()
 
         driver = init_driver()
+        cycle_pages(driver)
 
         for creator, redes in Creators.items():
             os.makedirs(f'./screenshots/{creator}', exist_ok=True)
-            
+
             for rede, user in redes.items():
                 if user:
                     if rede == 'INSTAGRAM':
                         driver.get(f'https://instagram.com/{user}')
-                    elif rede == 'TIKTOK':
-                        driver.get(f'https://tiktok.com/@{user}')
                     else:
-                        driver.get(f'https://youtube.com/@{user}')
-                    time.sleep(5)
+                        driver.get(f'https://{rede.lower()}.com/@{user}')
+                    time.sleep(10)
 
-                    driver.save_screenshot(f'./screenshots/{creator}/{rede}-{date}.png')
+                    driver.save_screenshot(
+                        f'./screenshots/{creator}/{rede}-{date}.png')
 
             logging.info(f'{creator} - OK')
 
@@ -107,5 +142,6 @@ def get_screenshots():
         logging.critical(error)
 
     driver.quit()
+
 
 get_screenshots()

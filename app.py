@@ -63,7 +63,7 @@ CREATORS = {
 
 def init_driver():
     try:
-        driver = uc.Chrome(headless=True, use_subprocess=False)
+        driver = uc.Chrome(headless=False, use_subprocess=False)
         driver.implicitly_wait(10)
 
         return driver

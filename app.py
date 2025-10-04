@@ -3,6 +3,7 @@ import os
 import time
 
 import undetected_chromedriver as uc
+from selenium.webdriver.chrome.options import Options
 
 logging.basicConfig(
     handlers=[logging.FileHandler('app.log'), logging.StreamHandler()],
@@ -63,7 +64,12 @@ CREATORS = {
 
 def init_driver():
     try:
-        driver = uc.Chrome(headless=False, use_subprocess=False)
+        options = Options()
+        options.binary_location = '/usr/bin/flatpak'
+        options.add_argument('run')
+        options.add_argument('com.google.Chrome')
+        # options.add_argument('-headless')
+        driver = uc.Chrome(options=options, use_subprocess=False)
         driver.implicitly_wait(10)
 
         return driver

@@ -27,7 +27,7 @@ CREATORS = {
     'aff': {
         'INSTAGRAM': 'affgirls',
         'TIKTOK': 'affcast',
-        'YOUTUBE': ''
+        'YOUTUBE': 'aaffgirls'
     },
     'tocomfome': {
         'INSTAGRAM': '_tocomfome_sp',
